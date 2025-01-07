@@ -23,6 +23,7 @@ urlpatterns = [
     path('product-type/', ProductTypeView.as_view({'get':'list','post':'create'})),
     path('product-type/<int:pk>/', ProductTypeView.as_view({'get':'retrieve','put':'update','patch':'partial_update', 'delete':'destroy'})),
     path('product/', ProductView.as_view({'get':'list','post':'create'})),
+    path('product/<int:pk>/', ProductView.as_view({'get':'retrieve', "put": "update", "delete": "destroy"})),
     path('vendor/', VendorView.as_view({'get':'list','post':'create'})),
     path('purchase/', PurchaseView.as_view({'get':'list','post':'create'})),
     path('department/', DepartmentView.as_view({'get':'list','post':'create'})),
