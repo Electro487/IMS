@@ -2,10 +2,15 @@ from django.shortcuts import render
 from .models import ProductType,Product,Purchase,Vendor,Sell,Department
 from django.http import HttpResponse
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from .seriallizers import ProductTypeSerializer, ProductSerializer, PurchaseSerializer, DepartmentSerializer, VendorSerializer, SellSerializer
+from .seriallizers import ProductTypeSerializer, ProductSerializer, PurchaseSerializer, DepartmentSerializer, VendorSerializer, SellSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
-# Create your views here.
+from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
+
+
 class ProductTypeView(ModelViewSet):
     queryset = ProductType.objects.all()
     serializer_class = ProductTypeSerializer
@@ -53,6 +58,31 @@ class ProductView(GenericViewSet):
         product_obj = self.get_object()
         product_obj.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(["POST"])
+def register_view(request):
+    password = request.data.get("password")
+    hash_password = make_password(password)
+    data = request.data.copy()
+    data["password"] = hash_password
+    serializer = UserSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST"])
+@permission_classes([])
+def login_view(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    user = authenticate(username=username, password=password)
+    if user == None:
+        return Response({"detail": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    else:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token.key}, status=status.HTTP_200_OK)
 
 class PurchaseView(GenericViewSet):
     queryset = Purchase.objects.all()

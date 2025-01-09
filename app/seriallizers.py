@@ -1,6 +1,17 @@
 from rest_framework import serializers
 from .models import ProductType,Product,Purchase,Vendor,Sell,Department
+from django.contrib.auth.models import User
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "password"]
+        extra_kwargs = {
+            "password": {
+                "write_only": True
+            }
+        }
+        
 class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
@@ -35,4 +46,4 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
-        
+
