@@ -1,11 +1,16 @@
 from rest_framework import serializers
 from .models import ProductType,Product,Purchase,Vendor,Sell,Department
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ["id", "name"]
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "password"]
+        fields = ["username", "password", "groups"]
         extra_kwargs = {
             "password": {
                 "write_only": True
